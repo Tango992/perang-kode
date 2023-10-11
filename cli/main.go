@@ -44,7 +44,7 @@ func main() {
 			for {
 				email, password := menuLogin()
 				user, authenticated, _ := handler.Login(email, password, db)
-	
+
 				if authenticated {
 					if user.Admin {
 						adminMenu(user, db)
@@ -94,7 +94,6 @@ func menuRegister(db *sql.DB) {
 		}
 		break
 	}
-
 
 	var email string
 	for {
@@ -175,7 +174,7 @@ func menuLogin() (string, []byte) {
 		fmt.Print("Email: ")
 		scanner.Scan()
 		email = scanner.Text()
-		
+
 		if !emailRegex.MatchString(email) {
 			fmt.Println("Input email tidak valid!")
 			continue
@@ -219,15 +218,18 @@ func userMenu(user entity.User, db *sql.DB) {
 		switch input {
 		case 1:
 			handler.ShowAllGames(db)
+
 		case 2:
-			userID := showCart()
-			handler.ShowCart(userID, db)
+			handler.ShowCart(user.Id, db)
+
 		case 3:
-			userID, gameID := inputCart()
-			handler.AddGameToCart(userID, gameID, db)
+			gameID := gameIdInput()
+			handler.AddGameToCart(user.Id, gameID, db)
+
 		case 4:
-			userID, gameID := deleteInput()
-			handler.RemoveGameFromCart(userID, gameID, db)
+			gameID := gameIdInput()
+			handler.RemoveGameFromCart(user.Id, gameID, db)
+
 		case 5:
 			if err := handler.GetVoucher(&user, db); err != nil {
 				log.Fatal(err)
@@ -243,62 +245,23 @@ func userMenu(user entity.User, db *sql.DB) {
 	}
 }
 
-
-func showCart() int {
-	fmt.Print("Masukan User_id: ")
-	var userID int
-	_, err := fmt.Scanln(&userID)
-	if err != nil {
-		fmt.Println("Terjadi kesalahan saat memproses masukan:", err)
-	} else {
-		fmt.Println("Masukan berhasil diterima. User ID:", userID)
-	}
-	return userID
-}
-
-func inputCart() (int, int) {
-	fmt.Print("Masukan User_id: ")
-	var userID int
-	_, err := fmt.Scanln(&userID)
-	if err != nil {
-		fmt.Println("Terjadi kesalahan saat memproses masukan:", err)
-		return 0, 0
-	}
-
-	fmt.Print("Masukan game_id: ")
+func gameIdInput() int {
 	var gameID int
-	_, err = fmt.Scanln(&gameID)
-	if err != nil {
-		fmt.Println("Terjadi kesalahan saat memproses masukan:", err)
-		return 0, 0
+	for {
+		fmt.Print("Masukkan Game ID: ")
+		_, err := fmt.Scanln(&gameID)
+		if err != nil {
+			fmt.Println("Terjadi kesalahan saat memproses masukan:", err)
+			continue
+		}
+		break
 	}
 
-	fmt.Println("Masukan berhasil diterima. User ID:", userID, "Game ID:", gameID)
-	return userID, gameID
+	fmt.Printf("\nInput berhasil diterima. Game ID: %v\n", gameID)
+	return gameID
 }
 
-func deleteInput() (int, int) {
-	fmt.Print("Masukan User_id: ")
-	var userID int
-	_, err := fmt.Scanln(&userID)
-	if err != nil {
-		fmt.Println("Terjadi kesalahan saat memproses masukan:", err)
-		return 0, 0
-	}
-
-	fmt.Print("Masukan game_id: ")
-	var gameID int
-	_, err = fmt.Scanln(&gameID)
-	if err != nil {
-		fmt.Println("Terjadi kesalahan saat memproses masukan:", err)
-		return 0, 0
-	}
-
-	fmt.Println("Masukan berhasil diterima. User ID:", userID, "Game ID:", gameID)
-	return userID, gameID
-}
-
-func adminMenu(user entity.User) {
+func adminMenu(user entity.User, db *sql.DB) {
 	for {
 		var input int
 		fmt.Printf("\nSelamat datang %v!\n", user.Name)
@@ -336,7 +299,7 @@ func adminMenu(user entity.User) {
 				}
 				break
 			}
-			
+
 			if err := handler.UpdateStock(db, input); err != nil {
 				log.Fatal(err)
 			}
