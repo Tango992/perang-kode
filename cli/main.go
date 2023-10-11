@@ -11,8 +11,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var scanner = bufio.NewScanner(os.Stdin)
-
 func main() {
 	db, err := config.ConnectDB()
 	if err != nil {
@@ -20,6 +18,7 @@ func main() {
 	}
 	defer db.Close()
 
+	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		var option int
 		handler.DisplayMainMenu()

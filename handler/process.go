@@ -27,14 +27,14 @@ func ShowAllGames(db *sql.DB) {
 		fmt.Printf("Game\t\t: %v\n", game.Name)
 		fmt.Printf("Description\t: %v\n", game.Description)
 		fmt.Printf("Maturity\t: %v\n", game.Maturity)
-		fmt.Printf("Price\t\t: %v\n", game.Price)
+		fmt.Printf("Price\t\t: %.2f\n", game.Price)
 		fmt.Printf("Stock\t\t: %v\n", game.Stock)
 	}
 }
 
 // ShowCart menampilkan isi cart pengguna
-func ShowCart(userID int, db *sql.DB) {
-	rows, err := db.Query("SELECT g.id, g.Name, g.Price FROM users_games u JOIN games g ON u.game_id = g.id WHERE u.user_id = ?", userID)
+func ShowCart(user entity.User, db *sql.DB) {
+	rows, err := db.Query("SELECT g.id, g.Name, g.Price FROM users_games u JOIN games g ON u.game_id = g.id WHERE u.user_id = ?", user.Id)
 	if err != nil {
 		fmt.Println("Error querying cart:", err)
 		return
@@ -43,36 +43,54 @@ func ShowCart(userID int, db *sql.DB) {
 
 	fmt.Println("Cart Anda:")
 	fmt.Println("-------------------------------------------------")
-	fmt.Println("| ID  | Nama             | Harga  |")
+	fmt.Println("| ID  | Nama                 | Harga  |")
 	fmt.Println("-------------------------------------------------")
-	
+
+	var subtotal float64
 	for rows.Next() {
 		var item entity.CartItem
 		if err := rows.Scan(&item.GameID, &item.Name, &item.Price); err != nil {
 			fmt.Println("Error scanning cart item:", err)
 			continue
 		}
-		fmt.Printf("| %-3d | %-16s | %-6.2f |\n", item.GameID, item.Name, item.Price)
+		subtotal += item.Price
+		fmt.Printf("| %-3d | %-20s | %-6.2f |\n", item.GameID, item.Name, item.Price)
 	}
-
+	fmt.Println("-------------------------------------------------")
+	fmt.Printf("                    Subtotal   %.2f\n", subtotal)
+	fmt.Printf("                     Voucher   %s\n", user.VoucherName)
+	fmt.Printf("                    Discount   %.2f%%\n\n", user.VoucherNominee * 100)
+	fmt.Printf("                 Grand Total   %.2f\n", subtotal * (1 - float64(user.VoucherNominee)))
 	fmt.Println("-------------------------------------------------")
 }
 
 // AddGameToCart menambahkan game ke cart pengguna
-func AddGameToCart(userID int, gameID int, db *sql.DB) error {
-	available, err := IsStockAvailable(gameID, db)
-	if err != nil {
+func AddGameToCart(user entity.User, gameID int, db *sql.DB) error {
+	var exists bool
+	row := db.QueryRow("SELECT EXISTS(SELECT * FROM users_games WHERE user_id = ? AND game_id = ?)", user.Id, gameID)
+	if err := row.Scan(&exists); err != nil {
 		return err
+	} else if exists {
+		fmt.Printf("\nGame sudah ada di cart anda\n")
+		return nil
+	}
+
+	available, err1 := IsStockAvailable(gameID, db)
+	if err1 != nil {
+		return err1
 	}
 
 	if available {
-		if _, err := db.Exec("INSERT INTO users_games (user_id, game_id) VALUES (?, ?)", userID, gameID); err != nil {
+		if _, err := db.Exec("INSERT INTO users_games (user_id, game_id) VALUES (?, ?)", user.Id, gameID); err != nil {
 			return err
 		}
 		
 		if _ , err := db.Exec("UPDATE games SET stock = stock - 1 WHERE id = ?", gameID); err != nil {
 			return err
 		}
+
+		ClearTerminal()
+		ShowCart(user, db)
 		fmt.Printf("\nGame berhasil dimasukkan ke dalam cart.\n")
 		return nil
 
@@ -86,16 +104,28 @@ func IsStockAvailable(gameID int, db *sql.DB) (bool, error) {
 	var stock int
 	err := db.QueryRow("SELECT stock FROM games WHERE id = ?", gameID).Scan(&stock)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("game id di luar jangkauan")
 	}
 	return stock >= 1, nil
 }
 
 // RemoveGameFromCart menghapus game dari cart pengguna.
-func RemoveGameFromCart(userID, gameID int, db *sql.DB) error {
-	_, err := db.Exec("DELETE FROM users_games WHERE user_id = ? AND game_id = ?", userID, gameID)
+func RemoveGameFromCart(user entity.User, gameID int, db *sql.DB) error {
+	var exists bool
+	row := db.QueryRow("SELECT EXISTS(SELECT * FROM users_games WHERE user_id = ? AND game_id = ?)", user.Id, gameID)
+	if err := row.Scan(&exists); err != nil {
+		return err
+	} else if !exists {
+		fmt.Printf("\nGame tidak terdapat di dalam cart anda\n")
+		return nil
+	}
+
+	_, err := db.Exec("DELETE FROM users_games WHERE user_id = ? AND game_id = ?", user.Id, gameID)
 	if err != nil {
 		return err
 	}
+	ClearTerminal()
+	ShowCart(user, db)
+	fmt.Printf("\nGame berhasil dihapus dari cart\n")
 	return nil
 }

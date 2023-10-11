@@ -17,8 +17,6 @@ import (
 
 var scanner = bufio.NewScanner(os.Stdin)
 
-
-
 func DisplayMainMenu() {
 	fmt.Printf("\nSelamat datang di Perang Kode CLI\n")
 	fmt.Println("Menu:")
@@ -35,7 +33,7 @@ func MenuRegister(db *sql.DB) {
 	fmt.Printf("\nREGISTER\n")
 	var name string
 	for {
-		fmt.Print("Masukkan nama: ")
+		fmt.Print("Masukkan nama\t\t: ")
 		scanner.Scan()
 		name = scanner.Text()
 
@@ -48,7 +46,7 @@ func MenuRegister(db *sql.DB) {
 
 	var email string
 	for {
-		fmt.Print("Masukkan email: ")
+		fmt.Print("Masukkan email\t\t: ")
 		scanner.Scan()
 		email = scanner.Text()
 
@@ -61,7 +59,7 @@ func MenuRegister(db *sql.DB) {
 
 	var bytePassword []byte
 	for {
-		fmt.Print("Masukkan password: 🔒")
+		fmt.Print("Masukkan password\t: 🔒")
 		bytePassword, _ = term.ReadPassword(int(syscall.Stdin))
 		fmt.Println()
 
@@ -74,7 +72,7 @@ func MenuRegister(db *sql.DB) {
 
 	var birth string
 	for {
-		fmt.Print("Masukkan tanggal lahir (YYYY-MM-DD): ")
+		fmt.Print("Tanggal lahir (YYYY-MM-DD): ")
 		scanner.Scan()
 		birth = scanner.Text()
 
@@ -87,7 +85,7 @@ func MenuRegister(db *sql.DB) {
 
 	var admin bool
 	for {
-		fmt.Print("Register sebagai admin? (y/n): ")
+		fmt.Print("Admin privilege? (y/n)\t: ")
 		scanner.Scan()
 		adminInput := scanner.Text()
 
@@ -123,7 +121,7 @@ func MenuLogin() (string, []byte) {
 
 	var email string
 	for {
-		fmt.Print("Email: ")
+		fmt.Print("Email\t\t: ")
 		scanner.Scan()
 		email = scanner.Text()
 
@@ -136,7 +134,7 @@ func MenuLogin() (string, []byte) {
 
 	var bytePassword []byte
 	for {
-		fmt.Print("Masukkan password: 🔒")
+		fmt.Print("Password\t: 🔒")
 		bytePassword, _ = term.ReadPassword(int(syscall.Stdin))
 		fmt.Println()
 
@@ -160,9 +158,10 @@ func UserMenu(user entity.User, db *sql.DB) {
 		fmt.Println("4. Hapus game dari cart")
 		fmt.Println("5. Get Voucher")
 		fmt.Println("6. Log Out")
-		fmt.Print("Masukkan pilihan sub-menu (1/2/3/4/5): ")
+		fmt.Print("Masukkan pilihan sub-menu (1/2/3/4/5/6): ")
 		scanner.Scan()
 		if _, err := fmt.Sscanf(scanner.Text(), "%d", &input); err != nil {
+			ClearTerminal()
 			fmt.Printf("\nInput harus berupa angka!\n")
 			continue
 		}
@@ -173,18 +172,20 @@ func UserMenu(user entity.User, db *sql.DB) {
 			ShowAllGames(db)
 
 		case 2:
-			ShowCart(user.Id, db)
+			ShowCart(user, db)
 
 		case 3:
+			ShowAllGames(db)
 			gameID := GameIdInput()
-			if err := AddGameToCart(user.Id, gameID, db); err != nil {
-				log.Printf("\n%v\n", err)
+			if err := AddGameToCart(user, gameID, db); err != nil {
+				fmt.Printf("\n%v\n", err)
 			}
 
 		case 4:
+			ShowCart(user, db)
 			gameID := GameIdInput()
-			if err := RemoveGameFromCart(user.Id, gameID, db); err != nil {
-				log.Printf("\n%v\n", err)
+			if err := RemoveGameFromCart(user, gameID, db); err != nil {
+				fmt.Printf("\n%v\n", err)
 			}
 
 		case 5:
@@ -197,7 +198,7 @@ func UserMenu(user entity.User, db *sql.DB) {
 			return
 
 		default:
-			fmt.Printf("\nInput di luar range 1-5\n")
+			fmt.Printf("\nInput di luar range 1-6\n")
 		}
 	}
 }
@@ -205,7 +206,7 @@ func UserMenu(user entity.User, db *sql.DB) {
 func GameIdInput() int {
 	var gameID int
 	for {
-		fmt.Print("Masukkan Game ID: ")
+		fmt.Printf("\nMasukkan Game ID: ")
 		_, err := fmt.Scanln(&gameID)
 		if err != nil {
 			fmt.Println("Terjadi kesalahan saat memproses masukan:", err)
@@ -235,30 +236,36 @@ func AdminMenu(user entity.User, db *sql.DB) {
 
 		switch input {
 		case 1:
-			DisplayStock(db)
-			var input entity.Stock
 			for {
-				fmt.Printf("\nMasukkan ID game: ")
-				scanner.Scan()
-				if _, err := fmt.Sscanf(scanner.Text(), "%d", &input.Id); err != nil {
-					fmt.Println("Input harus berupa angka")
-					continue
+				DisplayStock(db)
+				var input entity.Stock
+				for {
+					fmt.Printf("\nMasukkan ID game: ")
+					scanner.Scan()
+					if _, err := fmt.Sscanf(scanner.Text(), "%d", &input.Id); err != nil {
+						fmt.Println("Input harus berupa angka")
+						continue
+					}
+					break
 				}
-				break
-			}
-			for {
-				fmt.Printf("Masukkan stock game: ")
-				scanner.Scan()
-				if _, err := fmt.Sscanf(scanner.Text(), "%d", &input.Stock); err != nil {
-					fmt.Println("Input harus berupa angka")
+				for {
+					fmt.Printf("Masukkan stock game: ")
+					scanner.Scan()
+					if _, err := fmt.Sscanf(scanner.Text(), "%d", &input.Stock); err != nil {
+						fmt.Println("Input harus berupa angka")
+						continue
+					}
+					break
+				}
+	
+				if err := UpdateStock(db, input); err != nil {
+					ClearTerminal()
+					fmt.Println(err)
 					continue
 				}
 				break
 			}
 
-			if err := UpdateStock(db, input); err != nil {
-				log.Fatal(err)
-			}
 
 		case 2:
 			if err := UserReport(db); err != nil {
