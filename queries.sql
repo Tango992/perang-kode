@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS discounts (
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT NOT NULL,
     name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
     birth DATE NOT NULL,
     password VARCHAR(100) NOT NULL,
     admin BOOLEAN DEFAULT 0 NOT NULL,
@@ -54,7 +54,9 @@ CREATE TABLE IF NOT EXISTS users_games (
     id INT AUTO_INCREMENT NOT NULL,
     user_id INT NOT NULL,
     game_id INT NOT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (game_id) REFERENCES games(id)
 );
 
 
@@ -77,3 +79,12 @@ VALUES
     ("Grand Theft Auto V", "Grand Theft Auto V for PC offers players the option to explore the award-winning world of Los Santos and Blaine County in resolutions of up to 4k and beyond, as well as the chance to experience the game running at 60 frames per second.", 4, 30.00, 100),
     ("Stumble Guys", "Race through obstacle courses against up to 32 players online. Run, jump and dash to the finish line until the best player takes the crown!", 1, 15.00, 100),
     ("Forza Horizon 5", "Your Ultimate Horizon Adventure awaits! Explore the vibrant open world landscapes of Mexico with limitless, fun driving action in the worlds greatest cars.", 2, 50.00, 100);
+
+INSERT INTO users_games (user_id, game_id)
+VALUES 
+    (1, 1),
+    (1, 2),
+    (2, 3),
+    (2, 1),
+    (3, 4);
+    (3, 1);

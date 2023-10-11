@@ -7,5 +7,5 @@ type User struct {
 	Birth string
 	Password []byte
 	Admin bool
-	DiscountId int
+	Discount
 }
