@@ -1,0 +1,46 @@
+1. **Tabel "discounts"**: 
+Tabel ini digunakan untuk menyimpan informasi tentang voucher diskon. Setiap voucher memiliki ID unik (kolom "id"), kode voucher (kolom "voucher"), dan besaran diskon dalam bentuk persentase (kolom "nominee"). Ini adalah contoh bagaimana tabel ini akan terlihat:
+
+   | id | voucher   | nominee |
+   |----|-----------|---------|
+   | 1  | VOUCHER1  | 10.0    |
+   | 2  | VOUCHER2  | 5.0     |
+
+2. **Tabel "users"**: 
+Tabel ini berisi data pengguna. Setiap pengguna memiliki ID unik (kolom "id"), alamat email (kolom "email"), tanggal lahir (kolom "birth"), dan kata sandi (kolom "password"). Selain itu, ada kolom "admin" yang menunjukkan apakah pengguna adalah admin (dengan nilai boolean 1 atau 0), dan ada kolom "voucher_id" yang mengacu pada voucher diskon yang dimiliki oleh pengguna. Ini adalah contoh bagaimana tabel ini akan terlihat:
+
+   | id | email            | birth      | password | admin | voucher_id |
+   |----|------------------|------------|----------|-------|------------|
+   | 1  | user1@email.com  | 1990-01-01 | password1| 0     | 1          |
+   | 2  | user2@email.com  | 1985-02-15 | password2| 1     | NULL       |
+
+   Kolom "voucher_id" mengacu pada ID dari tabel "discounts," sehingga pengguna 1 memiliki "VOUCHER1" sebagai voucher mereka.
+
+3. **Tabel "maturity"**: Tabel ini digunakan untuk mengelompokkan permainan berdasarkan kategori kematangan. Setiap kategori memiliki ID unik (kolom "id"), nama kategori (kolom "name"), dan usia minimum yang diperlukan (kolom "minimum_age"). Ini adalah contoh bagaimana tabel ini akan terlihat:
+
+   | id | name       | minimum_age |
+   |----|------------|-------------|
+   | 1  | Kids       | 0           |
+   | 2  | Teen       | 13          |
+
+4. **Tabel "games"**: 
+Tabel ini digunakan untuk menyimpan informasi tentang permainan. Setiap permainan memiliki ID unik (kolom "id"), nama permainan (kolom "name"), deskripsi permainan (kolom "description"), ID kategori kematangan (kolom "maturity_id"), harga permainan (kolom "price"), dan stok permainan (kolom "stock"). Ini adalah contoh bagaimana tabel ini akan terlihat:
+
+   | id | name        | description         | maturity_id | price | stock |
+   |----|-------------|---------------------|------------|-------|-------|
+   | 1  | Game1       | Fun adventure game  | 1          | 20.0  | 100   |
+   | 2  | Game2       | Exciting action     | 2          | 30.0  | 50    |
+
+   Kolom "maturity_id" mengacu pada ID dari tabel "maturity," sehingga permainan 1 adalah permainan untuk anak-anak ("Kids").
+
+5. **Tabel "users_games"**: 
+Tabel ini digunakan untuk melacak hubungan antara pengguna dan permainan. Setiap entri dalam tabel ini memiliki ID unik (kolom "id") dan menghubungkan pengguna (kolom "user_id") dengan permainan (kolom "game_id"). Ada juga kolom "discount_id" yang mengacu pada voucher diskon yang digunakan pengguna saat membeli permainan tertentu. Ini adalah contoh bagaimana tabel ini akan terlihat:
+
+   | id | user_id | game_id | discount_id |
+   |----|---------|---------|------------|
+   | 1  | 1       | 1       | 1          |
+   | 2  | 2       | 2       | NULL       |
+
+   Dalam contoh di atas, pengguna 1 telah membeli "Game1" dengan menggunakan "VOUCHER1" sebagai voucher diskon, sementara pengguna 2 telah membeli "Game2" tanpa voucher diskon.
+
+Semua tabel tersebut telah dihubungkan dengan relasi FOREIGN KEY yang menciptakan keterkaitan antara mereka. Ini memungkinkan Anda untuk melacak hubungan antara pengguna, voucher diskon, kategori kematangan, dan permainan dalam database Anda dengan cara yang terstruktur.
