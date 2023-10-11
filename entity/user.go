@@ -5,7 +5,7 @@ type User struct {
 	Name string
 	Email string
 	Birth string
-	Password string
+	Password []byte
 	Admin bool
-	VoucherId int
+	DiscountId int
 }
