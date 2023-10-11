@@ -50,7 +50,7 @@ func main() {
 				if user.Admin {
 					adminMenu(user)
 				} else {
-					userMenu(user)
+					userMenu(user, db)
 				}
 			} else {
 				log.Fatal("Username / Password tidak sesuai")
@@ -100,7 +100,6 @@ func menuRegister(db *sql.DB) {
 	fmt.Print("Masukkan password: ")
 	bytePassword, _ := term.ReadPassword(syscall.Stdin)
 	fmt.Println()
-	
 
 	var birth string
 	for {
@@ -132,12 +131,11 @@ func menuRegister(db *sql.DB) {
 	}
 
 	user := entity.User{
-		Name: name,
-		Email: email,
-		Birth: birth,
+		Name:     name,
+		Email:    email,
+		Birth:    birth,
 		Password: bytePassword,
-		Admin: admin,
-
+		Admin:    admin,
 	}
 
 	if err := handler.Register(user, db); err != nil {
@@ -146,7 +144,6 @@ func menuRegister(db *sql.DB) {
 		fmt.Printf("\nRegistrasi berhasil!\n")
 	}
 }
-
 
 func menuLogin() (string, []byte) {
 
@@ -161,7 +158,7 @@ func menuLogin() (string, []byte) {
 	return email, bytePassword
 }
 
-func userMenu(user entity.User) {
+func userMenu(user entity.User, db *sql.DB) {
 	for {
 		var input int
 		fmt.Printf("\nSelamat datang %v!\n", user.Name)
@@ -179,13 +176,16 @@ func userMenu(user entity.User) {
 
 		switch input {
 		case 1:
-			fmt.Println("menu 1")
+			handler.ShowAllGames(db)
 		case 2:
-			fmt.Println("menu 2")
+			userID := showCart()
+			handler.ShowCart(userID, db)
 		case 3:
-			fmt.Println("menu 3")
+			userID, gameID := inputCart()
+			handler.AddGameToCart(userID, gameID, db)
 		case 4:
-			fmt.Println("menu 4")
+			userID, gameID := deleteInput()
+			handler.RemoveGameFromCart(userID, gameID, db)
 		case 5:
 			fmt.Printf("\nLogging out...\n")
 			return
@@ -193,6 +193,60 @@ func userMenu(user entity.User) {
 			fmt.Printf("\nInput di luar range 1-5\n")
 		}
 	}
+}
+
+func showCart() int {
+	fmt.Print("Masukan User_id: ")
+	var userID int
+	_, err := fmt.Scanln(&userID)
+	if err != nil {
+		fmt.Println("Terjadi kesalahan saat memproses masukan:", err)
+	} else {
+		fmt.Println("Masukan berhasil diterima. User ID:", userID)
+	}
+	return userID
+}
+
+func inputCart() (int, int) {
+	fmt.Print("Masukan User_id: ")
+	var userID int
+	_, err := fmt.Scanln(&userID)
+	if err != nil {
+		fmt.Println("Terjadi kesalahan saat memproses masukan:", err)
+		return 0, 0
+	}
+
+	fmt.Print("Masukan game_id: ")
+	var gameID int
+	_, err = fmt.Scanln(&gameID)
+	if err != nil {
+		fmt.Println("Terjadi kesalahan saat memproses masukan:", err)
+		return 0, 0
+	}
+
+	fmt.Println("Masukan berhasil diterima. User ID:", userID, "Game ID:", gameID)
+	return userID, gameID
+}
+
+func deleteInput() (int, int) {
+	fmt.Print("Masukan User_id: ")
+	var userID int
+	_, err := fmt.Scanln(&userID)
+	if err != nil {
+		fmt.Println("Terjadi kesalahan saat memproses masukan:", err)
+		return 0, 0
+	}
+
+	fmt.Print("Masukan game_id: ")
+	var gameID int
+	_, err = fmt.Scanln(&gameID)
+	if err != nil {
+		fmt.Println("Terjadi kesalahan saat memproses masukan:", err)
+		return 0, 0
+	}
+
+	fmt.Println("Masukan berhasil diterima. User ID:", userID, "Game ID:", gameID)
+	return userID, gameID
 }
 
 func adminMenu(user entity.User) {
