@@ -8,7 +8,7 @@ import (
 
 // ShowAllGames menampilkan semua daftar game
 func ShowAllGames(db *sql.DB) {
-	rows, err := db.Query("SELECT * FROM games")
+	rows, err := db.Query("SELECT g.id, g.name, g.description, m.name, g.price, g.stock FROM games g JOIN maturity m ON m.id = g.maturity_id ORDER BY g.id ASC")
 	if err != nil {
 		fmt.Println("Error querying games:", err)
 		return
@@ -16,20 +16,20 @@ func ShowAllGames(db *sql.DB) {
 	defer rows.Close()
 
 	fmt.Println("Daftar Game:")
-	fmt.Println("-------------------------------------------------")
-	fmt.Println("| ID  | Nama             	      | Deskripsi  | Maturity ID | Harga  | Stok |")
-	fmt.Println("-------------------------------------------------")
 
 	for rows.Next() {
 		var game entity.Game
-		if err := rows.Scan(&game.ID, &game.Name, &game.Description, &game.Maturity_id, &game.Price, &game.Stock); err != nil {
+		if err := rows.Scan(&game.ID, &game.Name, &game.Description, &game.Maturity, &game.Price, &game.Stock); err != nil {
 			fmt.Println("Error scanning game:", err)
 			continue
 		}
-		fmt.Printf("| %-3d | %-29s | %-94s | %-11d | %-6.2f | %-4d |\n", game.ID, game.Name, game.Description, game.Maturity_id, game.Price, game.Stock)
+		fmt.Printf("\nID\t\t: %v\n", game.ID)
+		fmt.Printf("Game\t\t: %v\n", game.Name)
+		fmt.Printf("Description\t: %v\n", game.Description)
+		fmt.Printf("Maturity\t: %v\n", game.Maturity)
+		fmt.Printf("Price\t\t: %v\n", game.Price)
+		fmt.Printf("Stock\t\t: %v\n", game.Stock)
 	}
-
-	fmt.Println("-------------------------------------------------")
 }
 
 // ShowCart menampilkan isi cart pengguna
@@ -45,7 +45,7 @@ func ShowCart(userID int, db *sql.DB) {
 	fmt.Println("-------------------------------------------------")
 	fmt.Println("| ID  | Nama             | Harga  |")
 	fmt.Println("-------------------------------------------------")
-
+	
 	for rows.Next() {
 		var item entity.CartItem
 		if err := rows.Scan(&item.GameID, &item.Name, &item.Price); err != nil {
@@ -66,11 +66,16 @@ func AddGameToCart(userID int, gameID int, db *sql.DB) error {
 	}
 
 	if available {
-		_, err := db.Exec("INSERT INTO users_games (user_id, game_id) VALUES (?, ?)", userID, gameID)
-		if err != nil {
+		if _, err := db.Exec("INSERT INTO users_games (user_id, game_id) VALUES (?, ?)", userID, gameID); err != nil {
 			return err
 		}
+		
+		if _ , err := db.Exec("UPDATE games SET stock = stock - 1 WHERE id = ?", gameID); err != nil {
+			return err
+		}
+		fmt.Printf("\nGame berhasil dimasukkan ke dalam cart.\n")
 		return nil
+
 	} else {
 		return fmt.Errorf("stok game tidak mencukupi")
 	}

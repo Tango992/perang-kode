@@ -7,7 +7,7 @@ type Game struct {
 	ID          int
 	Name        string
 	Description string
-	Maturity_id int
+	Maturity    string
 	Price       float64
 	Stock       int
 }
