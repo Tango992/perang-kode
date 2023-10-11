@@ -7,13 +7,14 @@ CREATE TABLE IF NOT EXISTS discounts (
 
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT NOT NULL,
+    name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
     birth DATE NOT NULL,
     password VARCHAR(100) NOT NULL,
     admin BOOLEAN DEFAULT 0 NOT NULL,
-    voucher_id INT,
+    discount_id INT,
     PRIMARY KEY (id),
-    FOREIGN KEY (voucher_id) REFERENCES discounts(id)
+    FOREIGN KEY (discount_id) REFERENCES discounts(id)
 );
 
 CREATE TABLE IF NOT EXISTS maturity (
@@ -38,9 +39,7 @@ CREATE TABLE IF NOT EXISTS users_games (
     id INT AUTO_INCREMENT NOT NULL,
     user_id INT NOT NULL,
     game_id INT NOT NULL,
-    discount_id INT,
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (game_id) REFERENCES games(id),
-    FOREIGN KEY (discount_id) REFERENCES discounts(id)
 );
