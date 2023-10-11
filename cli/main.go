@@ -10,8 +10,10 @@ import (
 	"perang-kode/entity"
 	"perang-kode/handler"
 	"regexp"
+	"syscall"
 
 	_ "github.com/go-sql-driver/mysql"
+	"golang.org/x/term"
 )
 
 var scanner = bufio.NewScanner(os.Stdin)
@@ -95,8 +97,8 @@ func menuRegister(db *sql.DB) {
 	}
 
 	fmt.Print("Masukkan password: ")
-	scanner.Scan()
-	password := scanner.Text()
+	bytePassword, _ := term.ReadPassword(syscall.Stdin)
+	fmt.Println()
 	
 	var birth string
 	for {
@@ -131,7 +133,7 @@ func menuRegister(db *sql.DB) {
 		Name: name,
 		Email: email,
 		Birth: birth,
-		Password: password,
+		Password: bytePassword,
 		Admin: admin,
 	}
 
@@ -143,17 +145,16 @@ func menuRegister(db *sql.DB) {
 }
 
 
-func menuLogin() (string, string) {
+func menuLogin() (string, []byte) {
 	fmt.Printf("\nLOGIN\n")
 	fmt.Print("Email: ")
 	scanner.Scan()
 	email := scanner.Text()
 
 	fmt.Print("Password: ")
-	scanner.Scan()
-	password := scanner.Text()
-
-	return email, password
+	bytePassword, _ := term.ReadPassword(syscall.Stdin)
+	fmt.Println()
+	return email, bytePassword
 }
 
 func userMenu(user entity.User) {

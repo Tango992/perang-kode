@@ -10,7 +10,7 @@ import (
 )
 
 func Register(user entity.User, db *sql.DB) error {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword(user.Password, bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
