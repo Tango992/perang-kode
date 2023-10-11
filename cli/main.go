@@ -42,8 +42,10 @@ func main() {
 
 		case 2:
 			email, password := menuLogin()
-			user, authenticated, _ := handler.Login(email, password, db)
-
+			user, authenticated, err := handler.Login(email, password, db)
+			if err != nil {
+				log.Fatal(err)
+			}
 			if authenticated {
 				if user.Admin {
 					adminMenu(user)
@@ -63,7 +65,6 @@ func main() {
 		}
 	}
 }
-
 
 func displayMainMenu() {
 	fmt.Printf("\nSelamat datang di Perang Kode CLI\n")
@@ -100,6 +101,7 @@ func menuRegister(db *sql.DB) {
 	bytePassword, _ := term.ReadPassword(syscall.Stdin)
 	fmt.Println()
 	
+
 	var birth string
 	for {
 		fmt.Print("Masukkan tanggal lahir (YYYY-MM-DD): ")
@@ -135,6 +137,7 @@ func menuRegister(db *sql.DB) {
 		Birth: birth,
 		Password: bytePassword,
 		Admin: admin,
+
 	}
 
 	if err := handler.Register(user, db); err != nil {
@@ -146,6 +149,7 @@ func menuRegister(db *sql.DB) {
 
 
 func menuLogin() (string, []byte) {
+
 	fmt.Printf("\nLOGIN\n")
 	fmt.Print("Email: ")
 	scanner.Scan()
