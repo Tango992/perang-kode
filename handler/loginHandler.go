@@ -2,7 +2,7 @@ package handler
 
 import (
 	"database/sql"
-	"perang-kode/entity"
+	"github.com/Tango992/perang-kode/entity"
 
 	"golang.org/x/crypto/bcrypt"
 )

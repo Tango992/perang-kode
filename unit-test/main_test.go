@@ -1,12 +1,11 @@
-package main
+package perangkode
 
 import (
 	"database/sql"
-	// "io"
 	"log"
 	"os"
-	"perang-kode/entity"
-	"perang-kode/handler"
+	"github.com/Tango992/perang-kode/entity"
+	"github.com/Tango992/perang-kode/handler"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

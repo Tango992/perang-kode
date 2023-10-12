@@ -3,7 +3,7 @@ package handler
 import (
 	"database/sql"
 	"fmt"
-	"perang-kode/entity"
+	"github.com/Tango992/perang-kode/entity"
 	"strings"
 )
 

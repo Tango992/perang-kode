@@ -1,4 +1,4 @@
-module perang-kode
+module github.com/Tango992/perang-kode
 
 go 1.20
 

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"perang-kode/config"
-	"perang-kode/handler"
+	"github.com/Tango992/perang-kode/config"
+	"github.com/Tango992/perang-kode/handler"
 
 	_ "github.com/go-sql-driver/mysql"
 )

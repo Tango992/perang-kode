@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"perang-kode/entity"
+	"github.com/Tango992/perang-kode/entity"
 	"regexp"
 	"runtime"
 	"syscall"

@@ -3,7 +3,7 @@ package handler
 import (
 	"database/sql"
 	"errors"
-	"perang-kode/entity"
+	"github.com/Tango992/perang-kode/entity"
 
 	my "github.com/go-mysql/errors"
 	"golang.org/x/crypto/bcrypt"

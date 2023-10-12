@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"math/rand"
-	"perang-kode/entity"
+	"github.com/Tango992/perang-kode/entity"
 )
 
 func GetVoucher(user *entity.User, db *sql.DB) error {
