@@ -1,10 +1,8 @@
-
 package main
 
 import (
 	"database/sql"
-	"fmt"
-	"io/ioutil"
+	// "io"
 	"log"
 	"os"
 	"perang-kode/entity"
@@ -15,6 +13,24 @@ import (
 )
 
 var db, dbfalse *sql.DB
+
+var user = entity.User{
+	Id:       1,
+	Name:     "Dummy",
+	Email:    "dummy@mail.com",
+	Birth:    "2001-01-01",
+	Password: []byte("dummy"),
+	Admin:    true,
+}
+
+var userFalse = entity.User{
+	Id:       0,
+	Name:     "Dummyfalse",
+	Email:    "dummyfalse@mail.com",
+	Birth:    "2001-01-01",
+	Password: []byte("dummyfalse"),
+	Admin:    true,
+}
 
 func TestMain(m *testing.M) {
 	var err error
@@ -43,95 +59,55 @@ func TestMain(m *testing.M) {
 }
 
 func TestRegister(t *testing.T) {
-	user := entity.User{
-		Name: "Dummy",
-		Email: "dummy@mail.com",
-		Birth: "2001-01-01",
-		Password: []byte("dummy"),
-		Admin: true,
-	}
-	assert.Nil(t, handler.Register(user, db))
-	assert.NotNil(t, handler.Register(user, dbfalse).Error())
-
-	assert.NotNil(t, handler.Register(user, dbfalse).Error())
+	assert.Nil(t, handler.Register(user, db))                 // Register
+	assert.NotNil(t, handler.Register(user, db).Error())      // Register with the same account
+	assert.NotNil(t, handler.Register(user, dbfalse).Error()) // Register with a false database
 }
-
 
 func TestLogin(t *testing.T) {
-	user := entity.User{
-		Email: "dummy@mail.com",
-		Password: []byte("dummy"),
-	}
-	userFalse := entity.User{
-		Email: "dummyfalse@mail.com",
-		Password: []byte("dummyfalse"),
-	}
-
 	_, _, success := handler.Login(user.Email, user.Password, db)
-	assert.Nil(t, success)
+	assert.Nil(t, success) // Login with registered account
 
 	_, _, failed := handler.Login(userFalse.Email, userFalse.Password, db)
-	assert.NotNil(t, failed.Error())
+	assert.NotNil(t, failed.Error()) // Login with false credentials
 }
 
-func TestShowAllGames(t *testing.T) {
-	old := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-
-	defer func() {
-		os.Stdout = old
-	}()
-
-	handler.ShowAllGames(db)
-	w.Close()
-	out, _ := ioutil.ReadAll(r)
-	fmt.Println("Output from ShowAllGames:", string(out))
+func TestShowAllgames(t *testing.T) {
+	os.Stdout = nil
+	assert.Nil(t, handler.ShowAllGames(db))                 // Show all games
+	assert.NotNil(t, handler.ShowAllGames(dbfalse).Error()) // Show all games with false database
 }
 
-// func TestShowCart(t *testing.T) {
-// 	os.Stdout = nil
-// 	assert.Nil(t, handler.ShowCart(db))
-// 	assert.NotNil(t, handler.ShowCart(falseDB()))
-// }
+func TestGetVoucher(t *testing.T) {
+	assert.Nil(t, handler.GetVoucher(&user, db))                 // Get voucher
+	assert.NotNil(t, handler.GetVoucher(&user, dbfalse).Error()) // Get voucher with false database
+}
 
-// func TestAddGameToCart(t *testing.T) {
-// 	os.Stdout = nil
-// 	assert.Nil(t, handler.AddGameToCart(db))
-// 	assert.NotNil(t, handler.AddGameToCart(falseDB()))
-// }
-// func TestIsStockAvailable(t *testing.T) {
-// 	os.Stdout = nil
-// 	assert.Nil(t, handler.IsStockAvailable(db))
-// 	assert.NotNil(t, handler.IsStockAvailable(falseDB()))
-// }
-// func TestRemoveGameFromCart(t *testing.T) {
-// 	os.Stdout = nil
-// 	assert.Nil(t, handler.RemoveGameFromCart(db))
-// 	assert.NotNil(t, handler.RemoveGameFromCart(falseDB()))
-// }
+func TestShowCart(t *testing.T) {
+	assert.Nil(t, handler.ShowCart(user, db))                 // Show cart
+	assert.NotNil(t, handler.ShowCart(user, dbfalse).Error()) // Show cart with false database
+}
 
-// func TestGetVoucher(t *testing.T) {
-// 	dataTrue := entity.Discount{
-// 		DiscountId:     1,
-// 		VoucherName:    "GAMERS",
-// 		VoucherNominee: 0.1,
-// 	}
+func TestAddGameToCart(t *testing.T) {
+	assert.Nil(t, handler.AddGameToCart(user, 1, db))                 //Adding game to cart
+	assert.NotNil(t, handler.AddGameToCart(user, 1, db))              //Adding duplicate game to cart
+	assert.NotNil(t, handler.AddGameToCart(user, -100, db).Error())   // Adding game to cart with non existent game
+	assert.NotNil(t, handler.AddGameToCart(user, 1, dbfalse).Error()) // Adding game to cart with false database
+	assert.NotNil(t, handler.AddGameToCart(userFalse, 1, db).Error()) // Adding game to cart with non existent user
+}
 
-// 	assert.Nil(t, handler.GetVoucher(db, dataTrue))
-
-// 	dataFalse := entity.Discount{
-// 		DiscountId:     -1,
-// 		VoucherName:    "GAMERS",
-// 		VoucherNominee: 0.1,
-// 	}
-// 	assert.NotNil(t, handler.GetVoucher(db, dataFalse))
-// }
+func TestRemoveGameFromCart(t *testing.T) {
+	assert.Nil(t, handler.RemoveGameFromCart(user, 1, db))                 // Remove game from cart
+	assert.NotNil(t, handler.RemoveGameFromCart(user, 1, db).Error())      // Remove game from cart that has already been removed
+	assert.NotNil(t, handler.RemoveGameFromCart(user, -100, db).Error())   // Remove game from cart with non existent game id
+	assert.NotNil(t, handler.RemoveGameFromCart(userFalse, 1, db).Error()) // Remove game from cart from non existent user
+	assert.NotNil(t, handler.RemoveGameFromCart(user, 1, dbfalse).Error()) // Remove game from cart with false database
+}
 
 func TestUserReport(t *testing.T) {
 	os.Stdout = nil
-	assert.Nil(t, handler.UserReport(db))
-	assert.NotNil(t, handler.UserReport(dbfalse).Error())
+	assert.Nil(t, handler.UserReport(db))                 // Display user report
+	assert.NotNil(t, handler.UserReport(dbfalse).Error()) // Display user report from false database
 }
 
 func TestUpdateStock(t *testing.T) {
@@ -139,27 +115,27 @@ func TestUpdateStock(t *testing.T) {
 		Id:    1,
 		Stock: 100,
 	}
-	assert.Nil(t, handler.UpdateStock(db, dataTrue))
+	assert.Nil(t, handler.UpdateStock(db, dataTrue)) // Updating stock
 
 	dataFalse1 := entity.Stock{
 		Id:    1,
 		Stock: -100,
 	}
-	assert.NotNil(t, handler.UpdateStock(db, dataFalse1).Error())
+	assert.NotNil(t, handler.UpdateStock(db, dataFalse1).Error()) // Updating stock with invalid quantity
 
 	dataFalse2 := entity.Stock{
 		Id:    -1,
 		Stock: 100,
 	}
-	assert.NotNil(t, handler.UpdateStock(db, dataFalse2).Error())
+	assert.NotNil(t, handler.UpdateStock(db, dataFalse2).Error()) // Updating stock with invalid game id
 }
 
 func TestStockReport(t *testing.T) {
-	assert.Nil(t, handler.DisplayStock(db))
-	assert.NotNil(t, handler.DisplayStock(dbfalse).Error())
+	assert.Nil(t, handler.DisplayStock(db))                 // Display stock
+	assert.NotNil(t, handler.DisplayStock(dbfalse).Error()) // Display stock with false database
 }
 
 func TestOrderReport(t *testing.T) {
-	assert.Nil(t, handler.OrderReport(db))
-	assert.NotNil(t, handler.OrderReport(dbfalse).Error())
+	assert.Nil(t, handler.OrderReport(db))                 // Display order report
+	assert.NotNil(t, handler.OrderReport(dbfalse).Error()) // Display order report from non existent database
 }

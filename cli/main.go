@@ -40,7 +40,7 @@ func main() {
 			for {
 				email, password := handler.MenuLogin()
 				user, authenticated, _ := handler.Login(email, password, db)
-
+				
 				if authenticated {
 					if user.Admin {
 						handler.ClearTerminal()

@@ -8,7 +8,9 @@ import (
 )
 
 func GetVoucher(user *entity.User, db *sql.DB) error {
-	if user.DiscountId != 0 {
+	if err := db.Ping(); err != nil {
+		return err
+	} else if user.DiscountId != 0 {
 		fmt.Printf("\nAnda sudah memiliki voucher '%v' dengan nominal %.2f%%\n", user.VoucherName, user.VoucherNominee * 100)
 		return nil
 	}
