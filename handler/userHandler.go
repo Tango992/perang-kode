@@ -6,10 +6,6 @@ import (
 	"github.com/Tango992/perang-kode/entity"
 )
 
-// SELECT u.id, u.name, u.email, u.birth, u.admin, IFNULL(d.voucher, 0), IFNULL(d.nominee, 0)
-// 		FROM users u
-// 		LEFT JOIN discounts d ON d.id = u.discount_id
-
 func UserReport(db *sql.DB) error {
 	rows, err := db.Query(`
 		SELECT u.id, u.name, u.email, u.birth, u.admin, IFNULL(d.voucher, 0), IFNULL(d.nominee, 0)
@@ -21,32 +17,30 @@ func UserReport(db *sql.DB) error {
 	defer rows.Close()
 
 	fmt.Printf("\nUSER REPORT\n")
+	fmt.Println("-------------------------------------------------------------------------------------------------")
+	fmt.Println("| ID | Nama                 | Email                | Birth      | Admin | Voucher    | Discount |")
+	fmt.Println("-------------------------------------------------------------------------------------------------")
+
 	for rows.Next() {
-		var adminbuffer int
+		var isAdmin int
 		var user entity.User
 
-		if err := rows.Scan(&user.Id, &user.Name, &user.Email, &user.Birth, &adminbuffer, &user.VoucherName, &user.VoucherNominee); err != nil {
+		if err := rows.Scan(&user.Id, &user.Name, &user.Email, &user.Birth, &isAdmin, &user.VoucherName, &user.VoucherNominee); err != nil {
 			return err
 		}
 
-		if adminbuffer == 1 {
+		if isAdmin == 1 {
 			user.Admin = true
 		} else {
 			user.Admin = false
 		}
 
-		fmt.Printf("\nUser ID\t\t: %v\n", user.Id)
-		fmt.Printf("Name\t\t: %v\n", user.Name)
-		fmt.Printf("Email\t\t: %v\n", user.Email)
-		fmt.Printf("Birthday\t: %v\n", user.Birth)
-		fmt.Printf("Admin privilege\t: %v\n", user.Admin)
-		if !user.Admin {
-			if user.VoucherNominee == 0 {
-				fmt.Printf("Voucher\t\t: -\n")
-				continue
-			}
-			fmt.Printf("Voucher\t\t: '%v' value %.2f%%\n", user.VoucherName, user.VoucherNominee * 100)
+		if user.VoucherNominee == 0 {
+			fmt.Printf("| %-2v | %-20s | %-20s | %-10s | %-5v | %-10s | %-8s |\n", user.Id, user.Name, user.Email, user.Birth, user.Admin, "-", "-")
+			continue
 		}
+		fmt.Printf("| %-2v | %-20s | %-20s | %-10s | %-5v | %-10s | %-7.2f%% |\n", user.Id, user.Name, user.Email, user.Birth, user.Admin, user.VoucherName, user.VoucherNominee * 100)
 	}
+	fmt.Println("-------------------------------------------------------------------------------------------------")
 	return nil
 }

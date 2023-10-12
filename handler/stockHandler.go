@@ -14,7 +14,9 @@ func DisplayStock(db *sql.DB) error {
 	}
 	defer rows.Close()
 
-	fmt.Printf("\nCURRENT STOCK\n")
+	fmt.Println("-------------------------------------------")
+	fmt.Println("| Game ID | Nama                 | Stock  |")
+	fmt.Println("-------------------------------------------")
 	for rows.Next() {
 		var row entity.Stock
 
@@ -22,10 +24,9 @@ func DisplayStock(db *sql.DB) error {
 			return err
 		}
 
-		fmt.Printf("\nID\t: %v\n", row.Id)
-		fmt.Printf("Game\t: %v\n", row.Name)
-		fmt.Printf("Stock\t: %v\n", row.Stock)
+		fmt.Printf("| %-7d | %-20s | %-6d |\n", row.Id, row.Name, row.Stock)
 	}
+	fmt.Println("-------------------------------------------")
 	return nil
 }
 

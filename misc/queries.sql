@@ -19,7 +19,7 @@ CREATE TABLE users (
 
 CREATE TABLE maturity (
     id INT AUTO_INCREMENT NOT NULL,
-    name VARCHAR (100) NOT NULL,
+    name VARCHAR(100) NOT NULL,
     minimum_age INT NOT NULL,
     PRIMARY KEY (id)
 );
@@ -34,7 +34,6 @@ CREATE TABLE games (
     PRIMARY KEY (id),
     FOREIGN KEY (maturity_id) REFERENCES maturity(id)
 );
-
 
 CREATE TABLE users_games (
     id INT AUTO_INCREMENT NOT NULL,

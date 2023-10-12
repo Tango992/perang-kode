@@ -83,6 +83,14 @@ func AddGameToCart(user entity.User, gameID int, db *sql.DB) error {
 	}
 
 	if available {
+		var minimumAge int
+		row := db.QueryRow("SELECT m.minimum_age FROM games g JOIN maturity m ON g.maturity_id = m.id WHERE g.id = ?", gameID)
+		if err := row.Scan(&minimumAge); err != nil {
+			return err
+		} else if user.Age < minimumAge {
+			return fmt.Errorf("usia anda tidak mencukupi")
+		}
+
 		if _, err := db.Exec("INSERT INTO users_games (user_id, game_id) VALUES (?, ?)", user.Id, gameID); err != nil {
 			return err
 		}
@@ -123,6 +131,10 @@ func RemoveGameFromCart(user entity.User, gameID int, db *sql.DB) error {
 
 	_, err := db.Exec("DELETE FROM users_games WHERE user_id = ? AND game_id = ?", user.Id, gameID)
 	if err != nil {
+		return err
+	}
+
+	if _ , err := db.Exec("UPDATE games SET stock = stock + 1 WHERE id = ?", gameID); err != nil {
 		return err
 	}
 	ClearTerminal()
