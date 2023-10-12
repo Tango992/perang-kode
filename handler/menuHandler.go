@@ -190,7 +190,7 @@ func UserMenu(user entity.User, db *sql.DB) {
 
 		case 5:
 			if err := GetVoucher(&user, db); err != nil {
-				log.Fatal(err)
+				fmt.Printf("\n%v\n", err)
 			}
 
 		case 6:
@@ -269,17 +269,17 @@ func AdminMenu(user entity.User, db *sql.DB) {
 
 		case 2:
 			if err := UserReport(db); err != nil {
-				log.Fatal(err)
+				fmt.Printf("\n%v\n",err)
 			}
 
 		case 3:
 			if err := OrderReport(db); err != nil {
-				log.Fatal(err)
+				fmt.Printf("\n%v\n",err)
 			}
 
 		case 4:
 			if err := DisplayStock(db); err != nil {
-				log.Fatal(err)
+				fmt.Printf("\n%v\n",err)
 			}
 
 		case 5:

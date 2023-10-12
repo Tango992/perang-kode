@@ -30,6 +30,14 @@ func DisplayStock(db *sql.DB) error {
 }
 
 func UpdateStock(db *sql.DB, data entity.Stock) error {
+	var exists bool
+	row := db.QueryRow("SELECT EXISTS(SELECT * FROM games WHERE id = ?)", data.Id)
+	if err := row.Scan(&exists); err != nil {
+		return err
+	} else if !exists {
+		return fmt.Errorf("game id di luar jangkauan")
+	}
+
 	_, err := db.Exec("UPDATE games SET stock = ? WHERE id = ?", data.Stock, data.Id)
 	if err != nil {
 		if my.MySQLErrorCode(err) == 1264 {

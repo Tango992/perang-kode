@@ -54,7 +54,11 @@ func ShowCart(user entity.User, db *sql.DB) {
 			continue
 		}
 		subtotal += item.Price
-		fmt.Printf("| %-3d | %-20s | %-6.2f |\n", item.GameID, item.Name, item.Price)
+		if item.Price == 0 {
+			fmt.Printf("| %-3d | %-20s | %-6s |\n", item.GameID, item.Name, "Free")
+		} else {
+			fmt.Printf("| %-3d | %-20s | %-6.2f |\n", item.GameID, item.Name, item.Price)
+		}
 	}
 	fmt.Println("-------------------------------------------------")
 	fmt.Printf("                    Subtotal   %.2f\n", subtotal)
