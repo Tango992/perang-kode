@@ -4,9 +4,10 @@ import (
 	"database/sql"
 	"log"
 	"os"
+	"testing"
+
 	"github.com/Tango992/perang-kode/entity"
 	"github.com/Tango992/perang-kode/handler"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -17,7 +18,8 @@ var user = entity.User{
 	Id:       1,
 	Name:     "Dummy",
 	Email:    "dummy@mail.com",
-	Birth:    "2001-01-01",
+	Birth:    "2005-01-01",
+	Age:      18,
 	Password: []byte("dummy"),
 	Admin:    true,
 }
@@ -26,7 +28,8 @@ var userFalse = entity.User{
 	Id:       0,
 	Name:     "Dummyfalse",
 	Email:    "dummyfalse@mail.com",
-	Birth:    "2001-01-01",
+	Birth:    "2005-01-01",
+	Age:      18,
 	Password: []byte("dummyfalse"),
 	Admin:    true,
 }
@@ -90,6 +93,7 @@ func TestShowCart(t *testing.T) {
 func TestAddGameToCart(t *testing.T) {
 	assert.Nil(t, handler.AddGameToCart(user, 1, db))                 //Adding game to cart
 	assert.NotNil(t, handler.AddGameToCart(user, 1, db))              //Adding duplicate game to cart
+	assert.NotNil(t, handler.AddGameToCart(user, 2, db))              // Adding game exceeding age limit
 	assert.NotNil(t, handler.AddGameToCart(user, -100, db).Error())   // Adding game to cart with non existent game
 	assert.NotNil(t, handler.AddGameToCart(user, 1, dbfalse).Error()) // Adding game to cart with false database
 	assert.NotNil(t, handler.AddGameToCart(userFalse, 1, db).Error()) // Adding game to cart with non existent user

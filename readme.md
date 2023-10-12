@@ -21,6 +21,8 @@ Gunakan command di bawah ini ke dalam terminal satu folder yang sudah terinisias
 go get -u github.com/Tango992/perang-kode@latest
 ```
 
+Lakukan `go mod tidy` setelah mengimport package ke dalam `main.go` anda.
+
 Jalankan `perangkode.Run(url string)` untuk memulai program.
 
 Untuk saat ini, URL database bersifat rahasia untuk penggunaan terbatas.
