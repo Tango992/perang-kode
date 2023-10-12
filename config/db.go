@@ -7,8 +7,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func ConnectDB() (*sql.DB, error) {
-	db, err := sql.Open("mysql", "root:@tcp(localhost:3306)/perang_kode")
+func ConnectDB(connection string) (*sql.DB, error) {
+	db, err := sql.Open("mysql", connection)
 	if err != nil {
 		return db, err
 	}

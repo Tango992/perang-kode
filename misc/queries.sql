@@ -1,11 +1,11 @@
-CREATE TABLE IF NOT EXISTS discounts (
+CREATE TABLE discounts (
     id INT AUTO_INCREMENT NOT NULL,
     voucher VARCHAR(100) NOT NULL,
     nominee FLOAT NOT NULL,
     PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE users (
     id INT AUTO_INCREMENT NOT NULL,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -17,14 +17,14 @@ CREATE TABLE IF NOT EXISTS users (
     FOREIGN KEY (discount_id) REFERENCES discounts(id)
 );
 
-CREATE TABLE IF NOT EXISTS maturity (
+CREATE TABLE maturity (
     id INT AUTO_INCREMENT NOT NULL,
     name VARCHAR (100) NOT NULL,
     minimum_age INT NOT NULL,
     PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS games (
+CREATE TABLE games (
     id INT AUTO_INCREMENT NOT NULL,
     name VARCHAR(100) NOT NULL,
     description VARCHAR(255) NOT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS games (
 );
 
 
-CREATE TABLE IF NOT EXISTS users_games (
+CREATE TABLE users_games (
     id INT AUTO_INCREMENT NOT NULL,
     user_id INT NOT NULL,
     game_id INT NOT NULL,

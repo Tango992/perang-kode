@@ -1,4 +1,4 @@
-package main
+package perangkode
 
 import (
 	"bufio"
@@ -11,8 +11,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func main() {
-	db, err := config.ConnectDB()
+func Run(connection string) {
+	db, err := config.ConnectDB(connection)
 	if err != nil {
 		log.Fatal(err)
 	}
