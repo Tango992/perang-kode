@@ -6,6 +6,10 @@ import (
 	"github.com/Tango992/perang-kode/entity"
 )
 
+// SELECT u.id, u.name, u.email, u.birth, u.admin, IFNULL(d.voucher, 0), IFNULL(d.nominee, 0)
+// 		FROM users u
+// 		LEFT JOIN discounts d ON d.id = u.discount_id
+
 func UserReport(db *sql.DB) error {
 	rows, err := db.Query(`
 		SELECT u.id, u.name, u.email, u.birth, u.admin, IFNULL(d.voucher, 0), IFNULL(d.nominee, 0)
@@ -39,9 +43,9 @@ func UserReport(db *sql.DB) error {
 		if !user.Admin {
 			if user.VoucherNominee == 0 {
 				fmt.Printf("Voucher\t\t: -\n")
-				return nil
+				continue
 			}
-			fmt.Printf("Voucher\t\t: '%v' value %v%%\n", user.VoucherName, user.VoucherNominee * 100)
+			fmt.Printf("Voucher\t\t: '%v' value %.2f%%\n", user.VoucherName, user.VoucherNominee * 100)
 		}
 	}
 	return nil
