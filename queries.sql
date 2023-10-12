@@ -1,17 +1,3 @@
--- 5 fitur:
--- 1. Register
--- 2. Login
--- 3. Lihat keranjang
--- 4. Tambah game
--- 5. Hapus game
--- 6. Discount
--- 7,8,9, 10 untuk admin
--- 7. Update stock
--- 8. User Reports
--- 9. Order Reports
--- 10. Stock Reports
-
-
 CREATE TABLE IF NOT EXISTS discounts (
     id INT AUTO_INCREMENT NOT NULL,
     voucher VARCHAR(100) NOT NULL,
@@ -79,12 +65,3 @@ VALUES
     ("Grand Theft Auto V", "Grand Theft Auto V for PC offers players the option to explore the award-winning world of Los Santos and Blaine County in resolutions of up to 4k and beyond, as well as the chance to experience the game running at 60 frames per second.", 4, 30.00, 100),
     ("Stumble Guys", "Race through obstacle courses against up to 32 players online. Run, jump and dash to the finish line until the best player takes the crown!", 1, 15.00, 100),
     ("Forza Horizon 5", "Your Ultimate Horizon Adventure awaits! Explore the vibrant open world landscapes of Mexico with limitless, fun driving action in the worlds greatest cars.", 2, 50.00, 100);
-
-INSERT INTO users_games (user_id, game_id)
-VALUES 
-    (1, 1),
-    (1, 2),
-    (2, 3),
-    (2, 1),
-    (3, 4);
-    (3, 1);
