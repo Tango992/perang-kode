@@ -28,7 +28,7 @@ Jalankan `perangkode.Run(url string)` untuk memulai program.
 Untuk saat ini, URL database bersifat rahasia untuk penggunaan terbatas.
 
 ```go
-import "github.com/Tango992/perang-kode
+import "github.com/Tango992/perang-kode"
 
 func main() {
     dbUrl := "[USERNAME]:[PASSWORD]@tcp([HOST]:[PORT])/[DBNAME]"
