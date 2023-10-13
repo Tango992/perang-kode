@@ -43,12 +43,13 @@ func ReportPerGame(db *sql.DB, game string) error {
 	defer rows.Close()
 
 	var grossIncome float32
-	counter := 1
+	var counter int
 	fmt.Printf("\n%v\n", strings.ToUpper(game))
 	fmt.Println("--------------------------------------------------")
 	fmt.Println("| No  | User ID |  Nama                 | Harga  |")
 	fmt.Println("--------------------------------------------------")
 	for rows.Next() {
+		counter++
 		var user entity.User
 		var price float32
 
@@ -64,7 +65,6 @@ func ReportPerGame(db *sql.DB, game string) error {
 			continue
 		}
 		fmt.Printf("| %-3v | %-7v | %-21v | %-6.2f |\n", counter, user.Id, user.Name, priceAfterDiscount)
-		counter++
 	}
 	fmt.Println("--------------------------------------------------")
 	fmt.Printf("|                       Gross Income    | %-6.2f |\n", grossIncome)
